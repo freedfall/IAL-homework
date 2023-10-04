@@ -74,7 +74,7 @@ void Stack_Error( int error_code ) {
 void Stack_Init( Stack *stack ) {
 	if (stack == NULL)
 		Stack_Error(SERR_INIT);
-
+	//init to -1 as free stack
 	stack->topIndex = -1;
 	stack->array = malloc(sizeof(MAX_STACK));
 }
@@ -141,9 +141,8 @@ void Stack_Top( const Stack *stack, char *dataPtr ) {
  * @param stack Ukazatel na inicializovanou strukturu zásobníku
  */
 void Stack_Pop( Stack *stack ) {
-
 	if (Stack_IsEmpty(stack))
-		printf("Stack is empty\n");
+		printf("Stack is empty\n"); //printing message that stack is empty (could be erased)
 	else
 		stack->topIndex--;
 }

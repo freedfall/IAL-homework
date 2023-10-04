@@ -95,8 +95,12 @@ void DLL_Dispose( DLList *list ) {
 	list->activeElement = NULL;
 
 	DLLElementPtr element = list->firstElement;
+
+    // Loop through each element in the list
 	while (element != NULL){
+        // Store a reference to the next element before freeing the current element
 		DLLElementPtr next_element = element->nextElement;
+
 		free(element);
 		element = next_element;
 	}
@@ -125,11 +129,14 @@ void DLL_InsertFirst( DLList *list, int data ) {
 	element->previousElement = NULL;
 	element->nextElement = list->firstElement;
 
+    // Update the previous element of the current first element (if it exists)
 	if (list->firstElement != NULL)
 		list->firstElement->previousElement = element;
-	
+
+    // Update the list's first element to the new element
 	list->firstElement = element;
 
+    // Update the list's last element to the new element if the list was initially empty
 	if (list->lastElement == NULL)
 		list->lastElement = element;
 }
@@ -153,11 +160,14 @@ void DLL_InsertLast( DLList *list, int data ) {
 	element->previousElement = list->lastElement;
 	element->nextElement = NULL;
 
+    // Update the next element of the current last element (if it exists)
 	if (list->lastElement != NULL)
 		list->lastElement->nextElement = element;
 	
+    // Update the list's last element to the new element
 	list->lastElement = element;
 
+    // Update the list's first element to the new element if the list was initially empty
 	if (list->firstElement == NULL)
 		list->firstElement = element;
 }
@@ -227,11 +237,13 @@ void DLL_DeleteFirst( DLList *list ) {
 	if (list->firstElement == NULL)
 		return;
 
+    // If the active element is the first element, unset it
 	if (list->activeElement == list->firstElement)
 		list->activeElement = NULL;
 
 	DLLElementPtr element = list->firstElement;
 
+	// If the list has only one element, set both first and last element to NULL
 	if (list->firstElement == list->lastElement){
 		list->firstElement = NULL;
 		list->lastElement = NULL;
@@ -257,13 +269,16 @@ void DLL_DeleteLast( DLList *list ) {
 	
 	DLLElementPtr element = list->lastElement;
 
+	// If the active element is the last element, unset it
 	if (list->activeElement == element)
 		list->activeElement = NULL;
-	
+
+	// If the list has only one element, set both first and last element to NULL
 	if (list->firstElement == list->lastElement){
 		list->firstElement = NULL;
 		list->lastElement = NULL;
 	}
+	// If the list has more than one element, update the last element
 	else{
 		list->lastElement = list->lastElement->previousElement;
 		list->lastElement->nextElement = NULL;
@@ -283,12 +298,16 @@ void DLL_DeleteAfter( DLList *list ) {
 	if (list->activeElement == NULL || list->activeElement == list->lastElement)
 		return;
 	
+	// Store a reference to the next element before freeing it
 	DLLElementPtr element = list->activeElement->nextElement;
 
+	// Update the next element of the active element
 	list->activeElement->nextElement = element->nextElement;
 
+	// If the active element is the last element, update the last element
 	if (list->lastElement == element)
 		list->lastElement = list->activeElement;
+	// If the active element is not the last element, update the next element
 	else
 		element->nextElement->previousElement = list->activeElement;
 	
@@ -306,12 +325,15 @@ void DLL_DeleteBefore( DLList *list ) {
 	if (list->activeElement == NULL || list->activeElement == list->firstElement)
 		return;
 	
+	// Store a reference to the previous element before freeing it
 	DLLElementPtr element = list->activeElement->previousElement;
 
 	list->activeElement->previousElement = element->previousElement;
 
+	// If the active element is the first element, update the first element
 	if (list->firstElement == element)
 		list->firstElement = list->activeElement;
+	// If the active element is not the first element, update the previous element
 	else
 		element->previousElement->nextElement = list->activeElement;
 	
@@ -330,22 +352,26 @@ void DLL_DeleteBefore( DLList *list ) {
 void DLL_InsertAfter( DLList *list, int data ) {
 	if (list->activeElement == NULL)
 		return;
-	
+
+	// Create a new element
 	DLLElementPtr element = (DLLElementPtr)malloc(sizeof (struct DLLElement));
 	if (!element){
 		DLL_Error();
 		return;
 	}
 
+	// Update the new element
 	element->data = data;
 	element->nextElement = list->activeElement->nextElement;
 	element->previousElement = list->activeElement;
 
+	// Update the next element of the current active element
 	if (list->activeElement->nextElement != NULL)
 		list->activeElement->nextElement->previousElement = element;
 	
 	list->activeElement->nextElement = element;
 
+	// Update the last element of the list if the active element is the last element
 	if (list->lastElement == list->activeElement)
 		list->lastElement = element;
 }
@@ -363,21 +389,25 @@ void DLL_InsertBefore( DLList *list, int data ) {
 	if (list->activeElement == NULL)
 		return;
 	
+	// Create a new element
 	DLLElementPtr element = (DLLElementPtr)malloc(sizeof (struct DLLElement));
 	if (!element){
 		DLL_Error();
 		return;
 	}
 
+	// Update the new element
 	element->data = data;
 	element->previousElement = list->activeElement->previousElement;
 	element->nextElement = list->activeElement;
 
+	// Update the previous element of the current active element
 	if (list->activeElement->previousElement != NULL)
 		list->activeElement->previousElement->nextElement = element;
 	
 	list->activeElement->previousElement = element;
 
+	// Update the first element of the list if the active element is the first element
 	if (list->firstElement == list->activeElement)
 		list->firstElement = element;
 }

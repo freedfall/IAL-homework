@@ -54,6 +54,7 @@ bool solved;
  * @param postfixExpressionLength Ukazatel na aktuální délku výsledného postfixového výrazu
  */
 void untilLeftPar( Stack *stack, char *postfixExpression, unsigned *postfixExpressionLength ) {
+	//end cycle when stack is empty
 	while (!Stack_IsEmpty(stack)){
 		char operator;
 		Stack_Top(stack, &operator);
@@ -177,17 +178,27 @@ char *infix2postfix( const char *infixExpression ) {
 	
 	unsigned postfixExpressionLength = 0;
 
+	// Loop through each character in the input infix expression
 	for (int i = 0; infixExpression[i] != '\0'; i++){
 		char c = infixExpression[i];
 
+        // If the character is a digit or a variable, add it to the postfix expression
 		if ( (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') )
 			postfixExpression[(postfixExpressionLength)++] = c;
+
+        // If the character is an opening parenthesis '(', push it onto the stack
 		else if (c == '(')
 			Stack_Push(stack, c);
+
+        // If the character is a closing parenthesis ')', call untilLeftPar function to delete
 		else if (c == ')')
 			untilLeftPar(stack, postfixExpression, &postfixExpressionLength);
+		
+        // If the character is an operator (+, -, *, /), process operators based on priority			
 		else if (c == '+' || c == '-' || c == '*' || c == '/')
 			doOperation(stack, c, postfixExpression, &postfixExpressionLength);
+		
+        // If the character is '=', process and empty the stack
 		else if (c == '=') {
 			while (!Stack_IsEmpty(stack)) {
 				Stack_Top(stack, &c);
@@ -195,14 +206,18 @@ char *infix2postfix( const char *infixExpression ) {
 				postfixExpression[postfixExpressionLength] = c;
 				postfixExpressionLength++;
 			}
+
+            // Add '=' to the postfix expression
 			postfixExpression[postfixExpressionLength] = '=';
 			postfixExpressionLength++;
 		} 
+        // If the character is neither an operator nor a digit/variable, add it to the postfix expression
 		else {
 			postfixExpression[postfixExpressionLength] = c;
 			postfixExpressionLength++;
 		}
 	}
+    // Null-terminate the postfix expression
 	postfixExpression[postfixExpressionLength] = '\0';
 
 	return postfixExpression;
@@ -276,12 +291,11 @@ void expr_value_pop(Stack *stack, int *value) {
  */
 
 VariableValue *getVariableValue(char variableName, VariableValue variableValues[], int variableValueCount) {
-	for(int i = 0; i<variableValueCount; i++) {
+	for(int i = 0; i < variableValueCount; i++) {
 		if (variableName == variableValues[i].name) {
 			return &variableValues[i];
 		}
 	}
-
 	return NULL;
 }
 
@@ -308,9 +322,12 @@ bool eval( const char *infixExpression, VariableValue variableValues[], int vari
 	if (postfixExpression == NULL)
 		return false;
 
+    // Initialize a stack for intermediate results
 	Stack _stack;
 	Stack *stack = &_stack;
 	Stack_Init(stack);
+
+    // Check if stack initialization was successful
 	if (stack->array == NULL) {
 		free(postfixExpression);
 		return false;
@@ -321,21 +338,28 @@ bool eval( const char *infixExpression, VariableValue variableValues[], int vari
 	int value2;
 
 	VariableValue *charData;
+
+    // Loop through each character in the postfix expression
 	for (int i = 0; postfixExpression[i] != '\0'; i++){
 		c = postfixExpression[i];
 		if (c == '+' || c == '-' || c == '*' || c == '/') {
+            // Operator encountered, pop two values from the stack and perform the operation
 			expr_value_pop(stack, &value1);
 			expr_value_pop(stack, &value2);
 			expr_value_push(stack, calculate(c, value2, value1));
 		} 
 		else if (c == '=') {
+            // Expression evaluation complete, pop the final result and clean up
 			expr_value_pop(stack, value);
 			free(postfixExpression);
 			Stack_Dispose(stack);
 			return true;
 		} 
-		else {
+		else { 
+            // Operand or variable encountered, push its value onto the stack
 			charData = getVariableValue(c, variableValues, variableValueCount);
+
+            // Check if the variable value exists
 			if (charData == NULL) {
 				free(postfixExpression);
 				Stack_Dispose(stack);
@@ -346,6 +370,7 @@ bool eval( const char *infixExpression, VariableValue variableValues[], int vari
 		}
 	}
 
+    // Clean up and return false if the evaluation did not complete as expected
 	free(postfixExpression);
 	Stack_Dispose(stack);
 	return false;
