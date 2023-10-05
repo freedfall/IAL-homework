@@ -346,6 +346,12 @@ bool eval( const char *infixExpression, VariableValue variableValues[], int vari
             // Operator encountered, pop two values from the stack and perform the operation
 			expr_value_pop(stack, &value1);
 			expr_value_pop(stack, &value2);
+			//Division by zero
+			if (c == '/' && value1 == 0){
+				free(postfixExpression);
+				Stack_Dispose(stack);
+				return false;
+			}
 			expr_value_push(stack, calculate(c, value2, value1));
 		} 
 		else if (c == '=') {
