@@ -124,6 +124,21 @@ TEST(test_eval_03, "Evaluate expression")
 	printf("eval result: %d\n", result);
 ENDTEST
 
+TEST(test_eval_04, "Evaluate expression - division by zero")
+	STACK_SIZE = 128;
+	expr = "a/b=";
+	VariableValue values[] = {
+			{'a', 10},
+			{'b', 0},
+	};
+	PRINT_EXPR_EVAL_CONFIG();
+	if (eval(expr, values, valuesCount, &result) == true) {
+		FAIL("eval() call returned true\n");
+	}
+	printf("eval result: %d\n", eval(expr, values, valuesCount, &result));
+ENDTEST
+
+
 
 void (*tests[])(void) = {
 		test_01,
@@ -139,6 +154,7 @@ void (*tests[])(void) = {
 		test_eval_01,
 		test_eval_02,
 		test_eval_03,
+		test_eval_04,
 };
 
 int main( int argc, char *argv[] ) {

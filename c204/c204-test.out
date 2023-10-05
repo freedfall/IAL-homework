@@ -88,3 +88,9 @@ expression : a*b+c/d=
 variables  : a = 10, b = 3, c = 100, d = 5
 eval result: 50
 
+
+[test_eval_04] Evaluate expression - division by zero
+expression : a/b=
+variables  : a = 10, b = 0
+eval result: 0
+
