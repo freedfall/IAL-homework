@@ -105,9 +105,9 @@ void doOperation(Stack *stack, char c, char *postfixExpression, unsigned *postfi
         if (priority[(int)c] <= topPriority) { // Cast 'c' to int
             Stack_Pop(stack);
             postfixExpression[(*postfixExpressionLength)++] = top;
-        } else {
+        } 
+		else
             break;
-        }
     }
 
     Stack_Push(stack, c);
@@ -237,9 +237,8 @@ char *infix2postfix( const char *infixExpression ) {
  */
 void expr_value_push(Stack *stack, int value) {
     // Push the individual bytes of the integer value onto the stack
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
         Stack_Push(stack, (char)((value >> (i * 8)) & 0xFF));
-    }
 }
 
 /**
@@ -292,9 +291,8 @@ void expr_value_pop(Stack *stack, int *value) {
 
 VariableValue *getVariableValue(char variableName, VariableValue variableValues[], int variableValueCount) {
 	for(int i = 0; i < variableValueCount; i++) {
-		if (variableName == variableValues[i].name) {
+		if (variableName == variableValues[i].name)
 			return &variableValues[i];
-		}
 	}
 	return NULL;
 }

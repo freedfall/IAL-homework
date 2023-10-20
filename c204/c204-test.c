@@ -77,6 +77,13 @@ TEST(test_10, "Parentheses change operator priority")
 	}
 ENDTEST
 
+TEST(test_11, "Complicated expression test")
+	if (convert("((A+B)/(C-D)*F)-(H*Q-G)+U/V=", &expr))
+	{
+		verify(expr, "AB+CD-/F*HQ*G--UV/+=");
+	}
+ENDTEST
+
 TEST(test_eval_01, "Evaluate expression")
 	STACK_SIZE = 128;
 	expr = "(a+b)*(c-d)=";
@@ -151,6 +158,7 @@ void (*tests[])(void) = {
 		test_08,
 		test_09,
 		test_10,
+		test_11,
 		test_eval_01,
 		test_eval_02,
 		test_eval_03,
