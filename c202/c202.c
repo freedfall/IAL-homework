@@ -72,11 +72,13 @@ void Stack_Error( int error_code ) {
  * @param stack Ukazatel na strukturu zásobníku
  */
 void Stack_Init( Stack *stack ) {
-	if (stack == NULL)
+	stack->array = (char *) malloc(STACK_SIZE * sizeof(char));
+	if (!stack) {
 		Stack_Error(SERR_INIT);
-	//init to -1 as free stack
+		return;
+	}
+	
 	stack->topIndex = -1;
-	stack->array = malloc(sizeof(MAX_STACK));
 }
 
 /**
@@ -89,7 +91,10 @@ void Stack_Init( Stack *stack ) {
  * @returns true v případě, že je zásobník prázdný, jinak false
  */
 bool Stack_IsEmpty( const Stack *stack ) {
-	return (stack->topIndex == -1) ? true : false;
+	if (stack->topIndex == -1)
+		return true;
+	
+	return false;
 }
 
 /**
@@ -104,8 +109,11 @@ bool Stack_IsEmpty( const Stack *stack ) {
  *
  * @returns true v případě, že je zásobník plný, jinak false
  */
-bool Stack_IsFull(const Stack *stack) {
-    return (stack->topIndex == STACK_SIZE - 1) ? true : false;
+bool Stack_IsFull( const Stack *stack ) {
+	if (stack->topIndex == STACK_SIZE - 1) 
+		return true;
+
+	return false;
 }
 
 /**
@@ -121,9 +129,10 @@ bool Stack_IsFull(const Stack *stack) {
  * @param dataPtr Ukazatel na cílovou proměnnou
  */
 void Stack_Top( const Stack *stack, char *dataPtr ) {
-	if (Stack_IsEmpty(stack))
+	if(Stack_IsEmpty(stack)) {
 		Stack_Error(SERR_TOP);
-
+		return;
+	}
 	*dataPtr = stack->array[stack->topIndex];
 }
 
@@ -142,9 +151,9 @@ void Stack_Top( const Stack *stack, char *dataPtr ) {
  */
 void Stack_Pop( Stack *stack ) {
 	if (Stack_IsEmpty(stack))
-		printf("Stack is empty\n"); //printing message that stack is empty (could be erased)
-	else
-		stack->topIndex--;
+		return;
+
+	stack->topIndex--;
 }
 
 
@@ -159,12 +168,14 @@ void Stack_Pop( Stack *stack ) {
  * @param data Znak k vložení
  */
 void Stack_Push( Stack *stack, char data ) {
-	if (Stack_IsFull(stack))
-		Stack_Error(SERR_PUSH);
-	
-	stack->topIndex++;
-	stack->array[stack->topIndex] = data;
+	if (Stack_IsFull(stack)) {
+        Stack_Error(SERR_PUSH);
+        return;
+    }
+    stack->topIndex++;
+    stack->array[stack->topIndex] = data;
 }
+
 
 
 /**
@@ -174,11 +185,11 @@ void Stack_Push( Stack *stack, char data ) {
  * @param stack Ukazatel na inicializovanou strukturu zásobníku
  */
 void Stack_Dispose( Stack *stack ) {
-	if (!Stack_IsEmpty(stack)){
-		free(stack->array);
-		stack->array = NULL;
-		stack->topIndex = -1;
-	}
+	if (!stack)
+        return;
+	free(stack->array);
+	stack->array = NULL;
+	stack->topIndex = -1;
 }
 
 /* Konec c202.c */
