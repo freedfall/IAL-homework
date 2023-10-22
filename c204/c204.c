@@ -168,12 +168,12 @@ char *infix2postfix( const char *infixExpression ) {
 	Stack _stack;
 	Stack *stack = &_stack;
 	Stack_Init(stack);
-	if (stack->array == NULL)
+	if (!stack->array)
 		return NULL;
 	
 	char *postfixExpression = (char *)malloc(sizeof(MAX_LEN * sizeof(char)));
 
-	if (postfixExpression == NULL)
+	if (!postfixExpression)
 		return NULL;
 	
 	unsigned postfixExpressionLength = 0;
@@ -219,7 +219,8 @@ char *infix2postfix( const char *infixExpression ) {
 	}
     // Null-terminate the postfix expression
 	postfixExpression[postfixExpressionLength] = '\0';
-
+	free(stack->array);
+	Stack_Dispose(stack);
 	return postfixExpression;
 }
 
@@ -316,7 +317,7 @@ int calculate(char operand, int operator1, int operator2) {
 
 bool eval( const char *infixExpression, VariableValue variableValues[], int variableValueCount, int *value ) {
 	char *postfixExpression = infix2postfix(infixExpression);
-	if (postfixExpression == NULL)
+	if (!postfixExpression)
 		return false;
 
     // Initialize a stack for intermediate results
@@ -325,7 +326,7 @@ bool eval( const char *infixExpression, VariableValue variableValues[], int vari
 	Stack_Init(stack);
 
     // Check if stack initialization was successful
-	if (stack->array == NULL) {
+	if (!stack->array) {
 		free(postfixExpression);
 		return false;
 	}
@@ -347,6 +348,7 @@ bool eval( const char *infixExpression, VariableValue variableValues[], int vari
 			// Check if the division by zero error occurred
 			if (c == '/' && value1 == 0) {
 				free(postfixExpression);
+				free(stack->array);
 				Stack_Dispose(stack);
 				return false;
 			}
@@ -356,6 +358,7 @@ bool eval( const char *infixExpression, VariableValue variableValues[], int vari
             // Expression evaluation complete, pop the final result and clean up
 			expr_value_pop(stack, value);
 			free(postfixExpression);
+			free(stack->array);
 			Stack_Dispose(stack);
 			return true;
 		} 
@@ -376,6 +379,7 @@ bool eval( const char *infixExpression, VariableValue variableValues[], int vari
 
     // Clean up and return false if the evaluation did not complete as expected
 	free(postfixExpression);
+	free(stack->array);
 	Stack_Dispose(stack);
 	return false;
 }
